@@ -54,8 +54,6 @@ void checkNNGradients(double lambda)
 	Mat<double> nn_params;
 	nn_params = join_vert(vectorise(Theta1), vectorise(Theta2));;
 
-
-
 	Mat<double> grad;
 	grad = nnCostFunction_grad(nn_params, input_layer_size, hidden_layer_size,
 		num_labels, X, y, lambda);

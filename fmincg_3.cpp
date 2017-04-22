@@ -1,10 +1,12 @@
-//implement fmincg
+//implement fmincg_3 
 #include "main.h"
 
-pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer_size, int32_t hidden_layer_size,
-	int32_t num_labels, Mat<double> X, Mat<double> y, double lambda)
+pair<Mat<double>, Mat<double>> fmincg_3(Mat<double> nn_params, Mat<int32_t> layer_size,
+	Mat<double> X, Mat<double> y, double lambda, Mat<uint32_t> Theta_indicator)
 {
 	pair<Mat<double>, Mat<double>> fmincg_return;
+	//fmincg_return.first = nn_params;//the Theta_new
+	//fmincg_return.second = fX;//the J vector,length of 50
 	int32_t length = 50;//max iteration length
 	double RHO = 0.01;// a bunch of constants for line searches
 	double 	SIG = 0.5;// RHO and SIG are the constants in the Wolfe - Powell conditions
@@ -24,36 +26,29 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 	double z1;
 	Mat<double>fX;
 
-
-
-	cout << "sum(sum(nn_params)):\r\n" << endl;
-	cout << sum(sum(nn_params)) << endl;
-	system("pause");
-	cout << "\n\r" << endl;
-	//bug here,the nn_params may go wrong.
-	J_grad_pair_1 = nnCostFunction_pair(nn_params, input_layer_size, hidden_layer_size,
-		num_labels, X, y, lambda);// get function value and gradient
-	/*cout << "nn comp"<< endl;
-	system("pause");
-	cout << "\n\r" << endl;*/
+	J_grad_pair_1 = nnCostFunction_pair_3(nn_params, layer_size, X, y,
+		lambda, Theta_indicator, 1);// get function value and gradient
+								  /*cout << "nn comp"<< endl;
+								  system("pause");
+								  cout << "\n\r" << endl;*/
 	i = i + (length<0);// count epochs ? !
 
-	/*cout << "i comp" << endl;
-	system("pause");
-	cout << "\n\r" << endl;*/
+					   /*cout << "i comp" << endl;
+					   system("pause");
+					   cout << "\n\r" << endl;*/
 
 	s = -J_grad_pair_1.second;// search direction is steepest
 	d1 = as_scalar(-s.t()*s);// this is the slope
-	
-	/*cout << "d1 comp" << endl;
-	system("pause");
-	cout << "\n\r" << endl;*/
 
-	z1 = (double) red / as_scalar(1 - d1); // initial step is red / (| s | +1)
+							 /*cout << "d1 comp" << endl;
+							 system("pause");
+							 cout << "\n\r" << endl;*/
 
-	/*cout << "z1 comp" << endl;
-	system("pause");
-	cout << "\n\r" << endl;*/
+	z1 = (double)red / as_scalar(1 - d1); // initial step is red / (| s | +1)
+
+										  /*cout << "z1 comp" << endl;
+										  system("pause");
+										  cout << "\n\r" << endl;*/
 
 	Mat<double> X0;
 
@@ -73,40 +68,29 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 	Mat<double> tmp;
 	vec temp_fX;
 
-	/*cout << "i:   " <<i<< endl;
-	system("pause");
-	cout << "\n\r" << endl;*/
-
 	while (i < abs(length))//while not finished
 	{
 		i = i + (length>0);// count iterations ? !
 
-		X0 = nn_params; J_grad_pair_0= J_grad_pair_1;// make a copy of current values
+		X0 = nn_params; J_grad_pair_0 = J_grad_pair_1;// make a copy of current values
 
-		nn_params = nn_params + z1*s; // begin line search
-		/*cout << " p1_i:  " << i << endl;
-		system("pause");
-		cout << "\n\r" << endl;*/
+		nn_params = nn_params + z1*s; 
 
-		J_grad_pair_2 = nnCostFunction_pair(nn_params, input_layer_size, hidden_layer_size,
-			num_labels, X, y, lambda);
-		/*cout << " Cost:  " << J_grad_pair_2.first << endl;
-		system("pause");
-		cout << "\n\r" << endl;*/
-		
+		J_grad_pair_2 = nnCostFunction_pair_3(nn_params, layer_size, X, y,
+			lambda, Theta_indicator, 1);
+
+
 		i = i + (length<0);// count epochs ? !
-		/*cout << " Cost:  \n\r" << J_grad_pair_2.first << endl;
-		cout << "Iter:  \n\r" << i << endl;
-		cout << "\n\r" << endl;*/
+						  
 
 		d2 = as_scalar((J_grad_pair_2.second).t()*s);
 
 		J_grad_pair_3.first = J_grad_pair_1.first; d3 = d1; z3 = -z1;// initialize point 3 equal to point 1
 
-		//bug in the below
+																
 		if (length > 0)
 		{
-			M = MAX; 
+			M = MAX;
 		}
 		else
 		{
@@ -118,9 +102,7 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 
 		while (1)
 		{
-			/*cout << " p2_i:  " << i << endl;
-			system("pause");
-			cout << "\n\r" << endl;*/
+			
 			while (((J_grad_pair_2.first > J_grad_pair_1.first + z1*RHO*d1) || (d2 > -SIG*d1)) && (M > 0))
 			{
 				limit = z1;//tighten the bracket
@@ -143,12 +125,9 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 				z2 = max(min(z2, INT*z3), (1 - INT)*z3);  // don't accept too close to limits
 				z1 = z1 + z2;// update the step
 
-				/*cout << "p_4 i:  " << i << endl;
-				system("pause");
-				cout << "\n\r" << endl;*/
 				nn_params = nn_params + z2*s;
-				J_grad_pair_2= nnCostFunction_pair(nn_params, input_layer_size, hidden_layer_size,
-					num_labels,X, y, lambda);//bug fixed here,X instead of nn_params
+				J_grad_pair_2 = nnCostFunction_pair_3(nn_params, layer_size, X, y,
+					lambda, Theta_indicator, 1);//bug fixed here,X instead of nn_params
 
 				M = M - 1; i = i + (length<0);// count epochs ? !
 				d2 = as_scalar((J_grad_pair_2.second).t()*s);
@@ -160,7 +139,7 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 			{
 				break; // this is a failure
 			}
-			else if(d2 > SIG*d1)
+			else if (d2 > SIG*d1)
 			{
 				success = 1; break;//success
 			}
@@ -205,35 +184,31 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 			J_grad_pair_3.first = J_grad_pair_2.first; d3 = d2; z3 = -z2;//set point 3 equal to point 2
 			z1 = z1 + z2; nn_params = nn_params + z2*s;//update current estimates
 
-			/*cout <<  " p5_i:  " << i << endl;
-			system("pause");
-			cout << "\n\r" << endl;*/
-
-			J_grad_pair_2= nnCostFunction_pair(nn_params, input_layer_size, hidden_layer_size,
-				num_labels, X, y, lambda);
+			J_grad_pair_2 = nnCostFunction_pair_3(nn_params, layer_size, X, y,
+				lambda, Theta_indicator, 1);
 			M = M - 1; i = i + (length<0);//count epochs ? !
 			d2 = as_scalar((J_grad_pair_2.second).t()*s);
 		}// end of line search
 
 		if (success)//if line search succeeded
 		{
-			
+
 			temp_fX.zeros(1, 1);
-			
+
 			J_grad_pair_1.first = J_grad_pair_2.first;
 			temp_fX = temp_fX + J_grad_pair_1.first;
 			fX = join_vert(fX, temp_fX);
 
-			cout <<"iteration:\r\n "<<i<< endl;
-			cout << "Cost: \r\n  " << J_grad_pair_1.first<<endl;
+			cout << "iteration:\r\n " << i << endl;
+			cout << "Cost: \r\n  " << J_grad_pair_1.first << endl;
 			cout << "\n\r" << endl;
 
 			//bug here,as_scalar useful
-			s= as_scalar((J_grad_pair_2.second).t()*(J_grad_pair_2.second) -
+			s = as_scalar((J_grad_pair_2.second).t()*(J_grad_pair_2.second) -
 				(J_grad_pair_1.second).t()*(J_grad_pair_2.second))
-				/ as_scalar((J_grad_pair_1.second).t()*(J_grad_pair_1.second))*s 
+				/ as_scalar((J_grad_pair_1.second).t()*(J_grad_pair_1.second))*s
 				- (J_grad_pair_2.second);//Polack-Ribiere direction
-			
+
 			tmp = (J_grad_pair_1.second);
 			(J_grad_pair_1.second) = (J_grad_pair_2.second);
 			(J_grad_pair_2.second) = tmp;//swap derivatives
