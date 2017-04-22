@@ -17,13 +17,12 @@ Mat<double> predict_3(Mat<double>nn_params, Mat<double> X, Mat<uint32_t> Theta_i
 
 	// Useful values
 	int32_t m;//5000
-	int32_t num_labels;//10
 	Mat<double> h1;//5000*133
 	Mat<double> h2;//5000*33
 	Mat<double> h3;//5000*10
 	Mat<double> temp;//5000*1
 	m = X.n_rows;//5000
-	num_labels = Theta3.n_rows;//10
+
 
 	predict_return.zeros(X.n_rows, 1);//5000*1
 	temp.ones(m, 1);//5000*1

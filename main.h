@@ -41,6 +41,14 @@ pair<Mat<double>, Mat<double>> fmincg_3(Mat<double> nn_params, Mat<int32_t> laye
 
 Mat<double> predict_3(Mat<double>Theta, Mat<double> X, Mat<uint32_t> Theta_indicator, Mat<int32_t> layer_size);
 
+pair<double, Mat<double>>  nnCostFunction_pair_n(Mat<double> nn_params, Mat<int32_t> layer_size,
+	Mat<double> X, Mat<double> y, double lambda, Mat<uint32_t> Theta_indicator, int32_t choice);
+
+pair<Mat<double>, Mat<double>> fmincg_n(Mat<double> nn_params, Mat<int32_t> layer_size,
+	Mat<double> X, Mat<double> y, double lambda, Mat<uint32_t> Theta_indicator);
+
+Mat<double> predict_n(Mat<double>Theta, Mat<double> X, Mat<uint32_t> Theta_indicator, Mat<int32_t> layer_size);
+
 /**
 * Extend 2-norm of a vector
 *

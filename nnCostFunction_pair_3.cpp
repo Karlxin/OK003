@@ -37,12 +37,12 @@ pair<double, Mat<double>>  nnCostFunction_pair_3(Mat<double> nn_params,
 	Mat<double> yk;//10*5000
 
 	a1 = X;//5000*401
-
 	z2 = Theta1 * a1.t();//133*401,401*5000;133*5000
+
 	a2 = sigmoid(z2);//133*5000
 	a2 = join_vert(X_vec_temp1.t(), a2);//134*5000
-
 	z3 = Theta2 * a2;//33*134,134*5000;33*5000
+
 	a3 = sigmoid(z3);//33*5000
 	a3 = join_vert(X_vec_temp1.t(), a3);//34*5000
 
