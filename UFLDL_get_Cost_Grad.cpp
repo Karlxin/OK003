@@ -56,7 +56,7 @@ pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visible
 
 	sparsity_penalty = as_scalar(beta*sum(sparsityParam*log(sparsityParam/ rho) + (1 - sparsityParam)*log((1 - sparsityParam)/ (1 - rho))));
 
-	cost_grad_return.first = as_scalar((1 / (double)m)*sum(squared_error,1)) + lambda / 2 * (sum(sum(square(W1))) + sum(sum(square(W2)))) + sparsity_penalty;
+	cost_grad_return.first = as_scalar((1 / (double)m)*sum(squared_error,1)) + (lambda /(2*(double)m)) * (sum(sum(square(W1))) + sum(sum(square(W2)))) + sparsity_penalty;
 
 	if (option == 0)//we just need cost
 	{
@@ -83,13 +83,15 @@ pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visible
 	Delta_W1 = delta_2*a1.t();
 	Delta_b1 = sum(delta_2, 1);
 
-	W1grad = (1 / (double)m)*Delta_W1 + lambda*W1;
-	W2grad = (1 / (double)m)*Delta_W2 + lambda*W2;
-	b1grad = (1 / (double)m)*Delta_b1;
-	b2grad = (1 / (double)m)*Delta_b2;
+	W1grad = Delta_W1 + lambda*W1;
+	W2grad = Delta_W2 + lambda*W2;
+	b1grad = Delta_b1;
+	b2grad = Delta_b2;
+
+	
 
 	cost_grad_return.second = join_vert(join_vert(join_vert(vectorise(W1grad), 
 		vectorise(W2grad)), vectorise(b1grad)), vectorise(b2grad));
-
+	cost_grad_return.second = cost_grad_return.second / (double)m;
 	return cost_grad_return;
 }

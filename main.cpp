@@ -302,14 +302,16 @@ main(int argc, char** argv)
 	cout << "\n\r" << endl;
 	//practice_4_Symmetry_Neural_Networks bottom*/
 	
-	//practice_5_UFLDL top
+	/*//practice_5_UFLDL top
 	//neuron:layer1_8*8=64,layer2_25,layer3_8*8=64
 	Mat<int32_t> layer_size;
-	layer_size = { 64,25};//the W1:25*64.
-	//layer_size = { 64,2 };//using to check gradient
+	//layer_size = { 64,25};//the W1:25*64.
+	layer_size = { 64,1 };//using to check gradient
 	layer_size = layer_size.t();
 	double sparsityParam = 0.01;// desired average activation of the hidden units.
-	double lambda = 0.0001;// weight decay parameter
+	//double lambda = 0.0001;// weight decay parameter
+	double lambda = 1;// weight decay parameter
+
 	double beta = 3;//weight of sparsity penalty term
 	Mat<double> patches;
 	patches.load("patches.txt");
@@ -319,19 +321,109 @@ main(int argc, char** argv)
 
 	pair<Mat<double>, Mat<double>> theta_fX_pair;
 
-	//UFLDL_checkNNGradients(theta, layer_size(0), layer_size(1), lambda, sparsityParam, beta, patches);
-
+	UFLDL_checkNNGradients(theta, layer_size(0), layer_size(1), lambda, sparsityParam, beta, patches);
+	system("pause");
 
 	theta_fX_pair=UFLDL_fmincg(theta, layer_size(0), layer_size(1),
 		lambda, sparsityParam, beta, patches);
 
 	Mat<double> W1;
+	
+	Mat<double> b1;
+	
 
+	b1 = theta_fX_pair.first.rows(2 * layer_size(0)*layer_size(1), 2 * layer_size(0)*layer_size(1) + layer_size(1) - 1);
+	cout << b1.t() << "\n\r" << endl;
 
 	W1 = reshape(theta_fX_pair.first.rows(0, layer_size(0)*layer_size(1) -1), layer_size(1), layer_size(0));
 	cout << W1.n_rows<<"\n\r"<<W1.n_cols << endl;
 	system("pause");
-	//practice_5_UFLDL bottom
+	//practice_5_UFLDL bottom*/
+
+	//practice_6_DeepLearning top
+	//first we pretrain neurons
+	//pretrain,use self-encoding to compress data,the size to be 400*133
+	Mat<int32_t> layer_size;
+	layer_size = { 400,133};//the W1:133*400.b1:133
+	layer_size = layer_size.t();
+	double sparsityParam = 0.01;// desired average activation of the hidden units.
+	double lambda = 1;// weight decay parameter
+	double beta = 3;//weight of sparsity penalty term
+	Mat<double> patches;
+	std::ifstream file("matlab_data_v2.txt");//to load the labeled sample
+	patches = load_mat<double>(file, "X").t();
+	
+	Mat<double> theta;
+
+	theta = UFLDL_init_rand(layer_size(0), layer_size(1));
+
+	pair<Mat<double>, Mat<double>> theta_fX_pair;
+	theta_fX_pair=UFLDL_fmincg(theta, layer_size(0), layer_size(1),
+	lambda, sparsityParam, beta, patches);
+	Mat<double> W1;
+	Mat<double> b1;
+
+	b1 = theta_fX_pair.first.rows(2 * layer_size(0)*layer_size(1), 2 * layer_size(0)*layer_size(1) + layer_size(1) - 1);
+	cout << b1.t() << "\n\r" << endl;
+
+	W1 = reshape(theta_fX_pair.first.rows(0, layer_size(0)*layer_size(1) -1), layer_size(1), layer_size(0));
+	cout << W1.n_rows<<"\n\r"<<W1.n_cols << endl;
+	system("pause");
+	
+	
+
+	//then we use the compressed data as input
+	//neuron:layer1_133,layer2_33,layer3_10
+	layer_size = { 133,33,10};
+	layer_size = layer_size.t();
+	Mat<double> X;//the photo,20*20 pixel 5000 photos,we uniform these into float 1:0,size:5000*400
+	Mat<double> y;//the label, we are about to recognize the arabic digits from integer 9:0,size:5000*1
+	Mat<double> Theta;//Theta1_133*401,Theta2_33*134,Theta3_10*34,Theta4_33*11,Theta5_133*34,Theta6_400*134
+	Mat<double> nn_params;//a temp for theta
+	X = sigmoid((W1*patches + repmat(b1, 1, patches.n_cols))).t();//data compress to 133 from 400
+	y = load_mat<double>(file, "y");
+	pair<double, Mat<double>>J_grad_pair_n;
+	Mat<uint32_t> Theta_indicator;
+	Theta_indicator.zeros(layer_size.n_rows);
+	int32_t i_init_Theta_indicator;
+
+#define Theta_num(k) ((layer_size(k+1))*((layer_size(k)+1)))
+
+	Theta_indicator(0) = 0;
+
+	for (i_init_Theta_indicator = 1; i_init_Theta_indicator < layer_size.n_rows; i_init_Theta_indicator++)
+	{
+		Theta_indicator(i_init_Theta_indicator) = Theta_indicator(i_init_Theta_indicator - 1) +
+			Theta_num(i_init_Theta_indicator - 1);
+	}
+
+	field<Mat<double>>initial_Theta(layer_size.n_rows - 1, 1);
+	Mat<double> initial_nn_params;
+	for (int i = 0; i < layer_size.n_rows - 1; i++)
+	{
+		initial_Theta(i) = randInitializeWeights(layer_size(i), layer_size(i + 1));
+	}
+
+	initial_nn_params = join_vert(vectorise(initial_Theta(0)), vectorise(initial_Theta(1)));
+	for (int i = 2; i < layer_size.n_rows - 1; i++)
+	{
+		initial_nn_params = join_vert(initial_nn_params, vectorise(initial_Theta(i)));
+	}
+
+	lambda = 1;
+	pair<Mat<double>, Mat<double>> fmincg_temp;
+
+	fmincg_temp = fmincg_n(initial_nn_params, layer_size, X, y, lambda, Theta_indicator);
+
+	Mat<double> pred;
+
+	pred = predict_n(fmincg_temp.first, X, Theta_indicator, layer_size);
+
+	cout << "\nTraining Set Accuracy:    \n " << (mean(conv_to<Mat<double>>::from(pred == y))) * 100 << endl;//bug here
+	system("pause");
+	cout << "\n\r" << endl;
+	//practice_6_DeepLearning bottom
+
 
 	//test top------------------------------
 	/*//test1 top

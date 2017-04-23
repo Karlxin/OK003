@@ -7,7 +7,7 @@ pair<Mat<double>, Mat<double>> UFLDL_fmincg(Mat<double> nn_params, int32_t visib
 {
 
 		pair<Mat<double>, Mat<double>> fmincg_return;
-		int32_t length = 50;//max iteration length
+		int32_t length = 100;//max iteration length
 		double RHO = 0.01;// a bunch of constants for line searches
 		double 	SIG = 0.5;// RHO and SIG are the constants in the Wolfe - Powell conditions
 		double 	INT = 0.1;// don't reevaluate within 0.1 of the limit of the current bracket
