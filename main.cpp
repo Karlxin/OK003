@@ -246,15 +246,14 @@ main(int argc, char** argv)
 	cout << "\n\r" << endl;
 	//practice_3_buildMultipleNeuralNetwork bottom*/
 
-	
-	//practice_4_Symmetry_Neural_Networks top
+
+	/*//practice_4_Symmetry_Neural_Networks top
 	//neuron:layer1_400,layer2_133,layer3_33,layer4_10,layer5_33,layer6_133,layer7_400
 	Mat<int32_t> layer_size;
 	layer_size = { 400,133,33,10};
 	layer_size = layer_size.t();
 	Mat<double> X;//the photo,20*20 pixel 5000 photos,we uniform these into float 1:0,size:5000*400
 	Mat<double> y;//the label, we are about to recognize the arabic digits from integer 9:0,size:5000*1
-	Mat<double> y_2;//the label, we are about to sparse self-coding,so y_2 labeled with 400 number,size:5000*1
 	Mat<double> Theta;//Theta1_133*401,Theta2_33*134,Theta3_10*34,Theta4_33*11,Theta5_133*34,Theta6_400*134
 	Mat<double> nn_params;//a temp for theta
 	double lambda;//generalization term
@@ -275,7 +274,7 @@ main(int argc, char** argv)
 		Theta_indicator(i_init_Theta_indicator) = Theta_indicator(i_init_Theta_indicator - 1) +
 			Theta_num(i_init_Theta_indicator - 1);
 	}
-	
+
 	field<Mat<double>>initial_Theta(layer_size.n_rows - 1, 1);
 	Mat<double> initial_nn_params;
 	for (int i = 0; i < layer_size.n_rows - 1; i++)
@@ -301,158 +300,188 @@ main(int argc, char** argv)
 	cout << "\nTraining Set Accuracy:    \n " << (mean(conv_to<Mat<double>>::from(pred == y))) * 100 << endl;//bug here
 	system("pause");
 	cout << "\n\r" << endl;
-	//practice_4_Symmetry_Neural_Networks bottom
+	//practice_4_Symmetry_Neural_Networks bottom*/
+	
+	//practice_5_UFLDL top
+	//neuron:layer1_8*8=64,layer2_25,layer3_8*8=64
+	Mat<int32_t> layer_size;
+	layer_size = { 64,25};//the W1:25*64.
+	//layer_size = { 64,2 };//using to check gradient
+	layer_size = layer_size.t();
+	double sparsityParam = 0.01;// desired average activation of the hidden units.
+	double lambda = 0.0001;// weight decay parameter
+	double beta = 3;//weight of sparsity penalty term
+	Mat<double> patches;
+	patches.load("patches.txt");
+	Mat<double> theta;
+
+	theta = UFLDL_init_rand(layer_size(0), layer_size(1));
+
+	pair<Mat<double>, Mat<double>> theta_fX_pair;
+
+	//UFLDL_checkNNGradients(theta, layer_size(0), layer_size(1), lambda, sparsityParam, beta, patches);
 
 
-		//test top------------------------------
-		/*//test1 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	theta_fX_pair=UFLDL_fmincg(theta, layer_size(0), layer_size(1),
+		lambda, sparsityParam, beta, patches);
 
-		A.reshape(A.n_rows*A.n_cols, 1);
-
-		cout << A << endl;
-		system("pause");
-		//test1 bottom*/
-
-		/*//test2 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		A = vectorise(A);
-
-		cout << A << endl;
-		system("pause");
-		//test2 bottom*/
-
-		/*//test3 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		A = vectorise(A);
-		A.reshape(3, 3);
-
-		cout << A << endl;
-		system("pause");
-		//test3 bottom*/
-
-		/*//test3 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		A = vectorise(A);
-		A.row(5);
-
-		cout << A.row(5) << endl;
-		system("pause");
-		//test3 bottom*/
+	Mat<double> W1;
 
 
-		/*//test4 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	W1 = reshape(theta_fX_pair.first.rows(0, layer_size(0)*layer_size(1) -1), layer_size(1), layer_size(0));
+	cout << W1.n_rows<<"\n\r"<<W1.n_cols << endl;
+	system("pause");
+	//practice_5_UFLDL bottom
 
-		A = sigmoid(A);
+	//test top------------------------------
+	/*//test1 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
-		cout << A << endl;
-		system("pause");
-		//test4 bottom*/
+	A.reshape(A.n_rows*A.n_cols, 1);
 
-		/*//test5 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	cout << A << endl;
+	system("pause");
+	//test1 bottom*/
 
+	/*//test2 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
+	A = vectorise(A);
 
-		cout << A(3)<<A(2,2) << endl;
-		system("pause");
-		//test5 bottom*/
+	cout << A << endl;
+	system("pause");
+	//test2 bottom*/
 
-		/*//test6 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	/*//test3 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
-		Mat<double> B;
-		B = log(A);
+	A = vectorise(A);
+	A.reshape(3, 3);
 
-		cout << B << endl;
-		system("pause");
-		//test6 bottom*/
+	cout << A << endl;
+	system("pause");
+	//test3 bottom*/
 
-		/*//test7 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	/*//test3 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
-		cout << sum(A) << endl;
-		system("pause");
-		//test7 bottom*/
+	A = vectorise(A);
+	A.row(5);
 
-		/*//test8 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		Mat<double> B;
-		B.ones(1, 1);
-
-		cout << B << endl;
-		system("pause");
-		//test8 bottom*/
-
-		/*//test9 top
-		Mat<double> A;
-		A.load("matlab_data_1.txt");
-
-		cout <<A.n_rows<<"   " <<A.n_cols<< endl;
-		system("pause");
-		//test9 bottom*/
-
-		/*//test10 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		cout <<A.rows(1,2)<<endl;
-		system("pause");
-		//test10 bottom*/
+	cout << A.row(5) << endl;
+	system("pause");
+	//test3 bottom*/
 
 
-		/*//test11 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	/*//test4 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
-		cout <<A.n_elem<<endl;
-		system("pause");
-		//test11 bottom*/
+	A = sigmoid(A);
+
+	cout << A << endl;
+	system("pause");
+	//test4 bottom*/
+
+	/*//test5 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
 
-		/*//test12 top
-		Mat<double> A;
-		A.load("mat1.txt");
-		vec a = vectorise(A);
 
-		cout << a << endl;
-		cout <<norm_karl(a)<<endl;
-		system("pause");
-		//test12 bottom*/
+	cout << A(3)<<A(2,2) << endl;
+	system("pause");
+	//test5 bottom*/
 
-		/*//test13 top
-		Mat<double> A;
-		Mat<double> B;
-		A.load("mat1.txt");
-		B = A;
-		cout <<(A==B) <<"\n\r"<< endl;
-		cout << mean(A == B) << "\n\r" << endl;
-		//test13 bottom*/
+	/*//test6 top
+	Mat<double> A;
+	A.load("mat1.txt");
 
-		/*//test14 top
-		Mat<double> A;
-		Mat<double> B;
-		Col<double> C;
-		C << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
-		A.load("mat1.txt");
-		B = reshape(C, 3, 3);
-		cout <<B <<"\n\r"<< endl;
-		//test14 bottom*/
-		//test bottom------------------------------
+	Mat<double> B;
+	B = log(A);
+
+	cout << B << endl;
+	system("pause");
+	//test6 bottom*/
+
+	/*//test7 top
+	Mat<double> A;
+	A.load("mat1.txt");
+
+	cout << sum(A) << endl;
+	system("pause");
+	//test7 bottom*/
+
+	/*//test8 top
+	Mat<double> A;
+	A.load("mat1.txt");
+
+	Mat<double> B;
+	B.ones(1, 1);
+
+	cout << B << endl;
+	system("pause");
+	//test8 bottom*/
+
+	/*//test9 top
+	Mat<double> A;
+	A.load("matlab_data_1.txt");
+
+	cout <<A.n_rows<<"   " <<A.n_cols<< endl;
+	system("pause");
+	//test9 bottom*/
+
+	/*//test10 top
+	Mat<double> A;
+	A.load("mat1.txt");
+
+	cout <<A.rows(1,2)<<endl;
+	system("pause");
+	//test10 bottom*/
+
+
+	/*//test11 top
+	Mat<double> A;
+	A.load("mat1.txt");
+
+	cout <<A.n_elem<<endl;
+	system("pause");
+	//test11 bottom*/
+
+
+	/*//test12 top
+	Mat<double> A;
+	A.load("mat1.txt");
+	vec a = vectorise(A);
+
+	cout << a << endl;
+	cout <<norm_karl(a)<<endl;
+	system("pause");
+	//test12 bottom*/
+
+	/*//test13 top
+	Mat<double> A;
+	Mat<double> B;
+	A.load("mat1.txt");
+	B = A;
+	cout <<(A==B) <<"\n\r"<< endl;
+	cout << mean(A == B) << "\n\r" << endl;
+	//test13 bottom*/
+
+	/*//test14 top
+	Mat<double> A;
+	Mat<double> B;
+	Col<double> C;
+	C << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
+	A.load("mat1.txt");
+	B = reshape(C, 3, 3);
+	cout <<B <<"\n\r"<< endl;
+	//test14 bottom*/
+	//test bottom------------------------------
 	return 0;
 }
 

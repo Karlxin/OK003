@@ -49,6 +49,21 @@ pair<Mat<double>, Mat<double>> fmincg_n(Mat<double> nn_params, Mat<int32_t> laye
 
 Mat<double> predict_n(Mat<double>Theta, Mat<double> X, Mat<uint32_t> Theta_indicator, Mat<int32_t> layer_size);
 
+Mat<double> UFLDL_init_rand(int32_t visibleSize,int32_t hiddenSize);
+
+pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
+	double lambda,double sparsityParam, double beta, Mat<double> patches, uint32_t option);
+
+pair<Mat<double>, Mat<double>> fminlbfgs(int32_t visibleSize,
+	int32_t hiddenSize, double lambda, double sparsityParam, double beta, Mat<double> patches,
+	Mat<double> x_init, int32_t options);//to be continued...
+
+pair<Mat<double>, Mat<double>> UFLDL_fmincg(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
+	double lambda, double sparsityParam, double beta, Mat<double> patches);
+
+void UFLDL_checkNNGradients(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
+	double lambda, double sparsityParam, double beta, Mat<double> patches);
+
 /**
 * Extend 2-norm of a vector
 *

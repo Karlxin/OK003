@@ -22,7 +22,7 @@ pair<Mat<double>, Mat<double>> fmincg(Mat<double> nn_params, int32_t input_layer
 	Mat<double> s;
 	double d1;
 	double z1;
-	Mat<double>fX;
+	Mat<double>fX;//a vector of function values "fX" indicating the progress made
 
 
 
