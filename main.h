@@ -54,10 +54,6 @@ Mat<double> UFLDL_init_rand(int32_t visibleSize,int32_t hiddenSize);
 pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
 	double lambda,double sparsityParam, double beta, Mat<double> patches, uint32_t option);
 
-pair<Mat<double>, Mat<double>> fminlbfgs(int32_t visibleSize,
-	int32_t hiddenSize, double lambda, double sparsityParam, double beta, Mat<double> patches,
-	Mat<double> x_init, int32_t options);//to be continued...
-
 pair<Mat<double>, Mat<double>> UFLDL_fmincg(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
 	double lambda, double sparsityParam, double beta, Mat<double> patches);
 
@@ -79,6 +75,4 @@ template<class Matrix>
 void print_matrix(Matrix matrix) {
 	matrix.print(std::cout);
 }
-
-
 

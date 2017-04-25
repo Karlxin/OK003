@@ -5,6 +5,7 @@
 pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
 	double lambda, double sparsityParam, double beta, Mat<double> patches,uint32_t option)
 {
+	//when option==0,just return the cost J.
 	pair<double, Mat<double>> cost_grad_return;
 	Mat<double> W1;
 	Mat<double> W2;

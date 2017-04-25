@@ -1,5 +1,37 @@
+/*--------------------------------version information top-------------------------------------------
+Started at 2016
+Created by Karlxin(410824290@qq.com)
+Github:https://github.com/Karlxin/OK003.git
+OpenKarlGeneralArtificialIntelligence
+Version:dev_000
+
+features:To be continued...
+
+Notice:Dev version created without large experiment.The comments for every single line of the code will
+be added soon.Karl has a whole theory to explain the control law and guide for optimization of gains.
+
+
+
+postscript:
+I am very grateful to Andrew Ng for the dreams of Artificial Intelligence and the open but valuable
+course of machine learning in Coursera.
+
+To make your life better.Making others' life better also.
+
+If you wanted experiments videos and theory,please send emails to Karl with 410824290@qq.com.
+
+Your time is valuable.No time for us to waste.Do our best to build the artificial intelligence
+
+I hope some day we will meet each other with our dreams achieved.
+
+Good Luck!
+
+EL PSY CONGROO
+--------------------------------version information bottom-------------------------------------------*/
+
 #include "main.h"
 
+//transmitting data from matlab to armadillo top
 // Extract the data as an Armadillo matrix Mat of type T, if there is no data the matrix will be empty
 template<typename T>
 arma::Mat<T> load_mat(std::ifstream &file, const std::string &keyword) {
@@ -28,12 +60,12 @@ arma::Mat<T> load_mat(std::ifstream &file, const std::string &keyword) {
 
 	}
 	return val;
-
 }
+//transmitting data from matlab to armadillo bottom
 
 
-int
-main(int argc, char** argv)
+//main top
+int main_1(int argc, char** argv)
 {
 	/*//practice_1_readMatrixFromMatlab top
 	Mat<double> fromMatlab_1;
@@ -576,5 +608,14 @@ main(int argc, char** argv)
 	//test bottom------------------------------
 	return 0;
 }
+//main bottom
+
+//I am Hououin Kyouma,a mad scientist,and the destroyer of this world's ruling structure.
+//Failure is out of the question.
+
+//Okay.I believe in you.
+
+//little butterfly do not be afraid,the turbulence can save the world.
+//OORGNO CYSPLE
 
 
