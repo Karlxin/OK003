@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <armadillo>
+#include <lbfgs.h>
 
 using namespace std;
 using namespace arma;
@@ -59,6 +60,9 @@ pair<Mat<double>, Mat<double>> UFLDL_fmincg(Mat<double> theta, int32_t visibleSi
 
 void UFLDL_checkNNGradients(Mat<double> theta, int32_t visibleSize, int32_t hiddenSize,
 	double lambda, double sparsityParam, double beta, Mat<double> patches);
+
+Col<double> fminlbfgs(Col<double> x_init, uint32_t N);
+
 
 /**
 * Extend 2-norm of a vector

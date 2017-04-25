@@ -377,7 +377,7 @@ typedef struct {
  */
 typedef lbfgsfloatval_t (*lbfgs_evaluate_t)(
     void *instance,
-    const lbfgsfloatval_t *x,
+    lbfgsfloatval_t *x,
     lbfgsfloatval_t *g,
     const int n,
     const lbfgsfloatval_t step
