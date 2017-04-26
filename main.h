@@ -63,7 +63,15 @@ void UFLDL_checkNNGradients(Mat<double> theta, int32_t visibleSize, int32_t hidd
 
 Col<double> fminlbfgs(Col<double> x_init, uint32_t N);
 
+Mat<double> UFLDL_init_rand_n(Mat<int32_t> layer_size);
 
+pair<double, Mat<double>> UFLDL_get_Cost_Grad_n(Mat<double> theta, Mat<int32_t> layer_size,
+	double lambda, double sparsityParam, double beta, Mat<double> patches, uint32_t option,
+	Mat<uint32_t> Theta_indicator_UFLDL);
+
+pair<double, Mat<double>> UFLDL_get_Cost_Grad_n_show(Mat<double> theta, Mat<int32_t> layer_size,
+	double lambda, double sparsityParam, double beta, Mat<double> patches, uint32_t option,
+	Mat<uint32_t> Theta_indicator_UFLDL);
 /**
 * Extend 2-norm of a vector
 *

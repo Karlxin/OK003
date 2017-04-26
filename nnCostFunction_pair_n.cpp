@@ -38,7 +38,7 @@ pair<double, Mat<double>>  nnCostFunction_pair_n(Mat<double> nn_params,
 		a_field(i)= join_vert(X_vec_temp1.t(), a_field(i));//134*5000
 		z_field(i) = theta_field(i)*a_field(i);//133*401,401*5000;133*5000.
 	}
-	z_field(layer_size.n_rows - 2) = theta_field(layer_size.n_rows - 2)*a_field(layer_size.n_rows - 2);
+	//z_field(layer_size.n_rows - 2) = theta_field(layer_size.n_rows - 2)*a_field(layer_size.n_rows - 2);
 
 	hx = sigmoid(z_field(layer_size.n_rows - 2));
 	yk.zeros(layer_size(layer_size.n_rows - 1), m);

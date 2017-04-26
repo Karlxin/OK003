@@ -73,10 +73,10 @@ pair<double, Mat<double>> UFLDL_get_Cost_Grad(Mat<double> theta, int32_t visible
 	Mat<double> Delta_W1;
 	Mat<double> Delta_b1;
 
-	grad_z3 = h%(1 - h);
-	delta_3 = -(y - h)%grad_z3;
+	grad_z3 = h%(1 - h);//400*5000
+	delta_3 = -(y - h)%grad_z3;//400*5000
 
-	grad_z2 = a2%(1 - a2);
+	grad_z2 = a2%(1 - a2);//grad_z last but one correspond to a last
 	delta_2 = (W2.t()*delta_3+repmat(beta*(-sparsityParam/rho+(1-sparsityParam)/(1-rho)),1,m))%grad_z2;
 
 	Delta_W2 = delta_3*a2.t();

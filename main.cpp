@@ -39,6 +39,7 @@ double sparsityParam_fminlbfgs = 0.01;// desired average activation of the hidde
 double lambda_fminlbfgs = 1;// weight decay parameter
 double beta_fminlbfgs = 3;//weight of sparsity penalty term
 Mat<double> patches_fminlbfgs;
+Mat<uint32_t> Theta_indicator_UFLDL;
 //for fminlbfgs bottom
 
 
@@ -468,7 +469,7 @@ int main(int argc, char** argv)
 	cout << "\n\r" << endl;
 	//practice_6_DeepLearning bottom*/
 
-	//practice_6_DeepLearning_fminlbfgs top
+	/*//practice_7_DeepLearning_fminlbfgs top
 	//first we pretrain neurons
 	//pretrain,use self-encoding to compress data,the size to be 400*133
 
@@ -567,157 +568,293 @@ int main(int argc, char** argv)
 	cout << "\nTraining Set Accuracy:    \n " << (mean(conv_to<Mat<double>>::from(pred == y))) * 100 << endl;//bug here
 	system("pause");
 	cout << "\n\r" << endl;
-	//practice_7_DeepLearning_fminlbfgs bottom
+	//practice_7_DeepLearning_fminlbfgs bottom*/
 
-		//test top------------------------------
-		/*//test1 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	//practice_8_DeepLearning_fminlbfgs_n top
+#define Theta_num(k) ((layer_size(k+1))*((layer_size(k)+1)))
+	//first we pretrain neurons
+	//pretrain,use self-encoding to compress data,the size to be 400*133
 
-		A.reshape(A.n_rows*A.n_cols, 1);
+	//for fminlbfgs top
+	Mat<int32_t> layer_size;
+	//layer_size = { 400,133 };//the W1:133*400.b1:133
+	//layer_size = layer_size.t();
+	//double sparsityParam = 0.01;// desired average activation of the hidden units.
+	double lambda = 1;// weight decay parameter
+					  //double beta = 3;//weight of sparsity penalty term
+	Mat<double> patches;
+	//for fminlbfgs bottom
 
-		cout << A << endl;
-		system("pause");
-		//test1 bottom*/
+	//for fminlbfgs top
+	//Mat<int32_t> layer_size_fminlbfgs;
+	layer_size_fminlbfgs = { 400,10,400 };
+	layer_size_fminlbfgs = layer_size_fminlbfgs.t();
+	layer_size = layer_size_fminlbfgs;
+	//double sparsityParam_fminlbfgs = 0.01;// desired average activation of the hidden units.
+	//double lambda_fminlbfgs = 1;// weight decay parameter
+	//double beta_fminlbfgs = 3;//weight of sparsity penalty term
+	//Mat<double> patches_fminlbfgs;
+	//for fminlbfgs bottom
 
-		/*//test2 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	std::ifstream file("matlab_data_v2.txt");//to load the labeled sample
+	patches = load_mat<double>(file, "X").t();
+	patches_fminlbfgs = patches;
 
-		A = vectorise(A);
-
-		cout << A << endl;
-		system("pause");
-		//test2 bottom*/
-
-		/*//test3 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		A = vectorise(A);
-		A.reshape(3, 3);
-
-		cout << A << endl;
-		system("pause");
-		//test3 bottom*/
-
-		/*//test3 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		A = vectorise(A);
-		A.row(5);
-
-		cout << A.row(5) << endl;
-		system("pause");
-		//test3 bottom*/
+	Mat<double> theta;
 
 
-		/*//test4 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	Theta_indicator_UFLDL.zeros(layer_size.n_rows);
+	int32_t i_init_Theta_indicator_UFLDL;
+	Theta_indicator_UFLDL(0) = 0;
 
-		A = sigmoid(A);
+	for (i_init_Theta_indicator_UFLDL = 1;
+		i_init_Theta_indicator_UFLDL < layer_size.n_rows;
+		i_init_Theta_indicator_UFLDL++)
+	{
+		Theta_indicator_UFLDL(i_init_Theta_indicator_UFLDL) =
+			Theta_indicator_UFLDL(i_init_Theta_indicator_UFLDL - 1) +
+			Theta_num(i_init_Theta_indicator_UFLDL - 1);
+	}
 
-		cout << A << endl;
-		system("pause");
-		//test4 bottom*/
-
-		/*//test5 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-
-
-		cout << A(3)<<A(2,2) << endl;
-		system("pause");
-		//test5 bottom*/
-
-		/*//test6 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		Mat<double> B;
-		B = log(A);
-
-		cout << B << endl;
-		system("pause");
-		//test6 bottom*/
-
-		/*//test7 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		cout << sum(A) << endl;
-		system("pause");
-		//test7 bottom*/
-
-		/*//test8 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		Mat<double> B;
-		B.ones(1, 1);
-
-		cout << B << endl;
-		system("pause");
-		//test8 bottom*/
-
-		/*//test9 top
-		Mat<double> A;
-		A.load("matlab_data_1.txt");
-
-		cout <<A.n_rows<<"   " <<A.n_cols<< endl;
-		system("pause");
-		//test9 bottom*/
-
-		/*//test10 top
-		Mat<double> A;
-		A.load("mat1.txt");
-
-		cout <<A.rows(1,2)<<endl;
-		system("pause");
-		//test10 bottom*/
+	theta = UFLDL_init_rand_n(layer_size);
 
 
-		/*//test11 top
-		Mat<double> A;
-		A.load("mat1.txt");
+	vec new_theta;
+	new_theta = fminlbfgs(theta, theta.n_rows);
 
-		cout <<A.n_elem<<endl;
-		system("pause");
-		//test11 bottom*/
+	field<Mat<double>> W(layer_size.n_rows - 1, 1);
+	field<Mat<double>> b(layer_size.n_rows - 1, 1);
+	field<Mat<double>>theta_field(layer_size.n_rows - 1, 1);
+
+	for (int i = 0; i < layer_size.n_rows - 1; i++)
+	{
+		theta_field(i) = (reshape(new_theta.rows(Theta_indicator_UFLDL(i), \
+			Theta_indicator_UFLDL(i + 1) - 1), layer_size(i + 1), (layer_size(i) + 1)));
+		W(i) = theta_field(i).cols(0, theta_field(i).n_cols - 2);
+		b(i) = theta_field(i).col(theta_field(i).n_cols - 1);
+	}
+	W.save("W.mat");
+	b.save("B.mat");
+	system("pause");
+	//practice_8_DeepLearning_fminlbfgs_n bottom
+
+	/*//practice_9_DeepLearning_fminlbfgs_n_show top
+#define Theta_num(k) ((layer_size(k+1))*((layer_size(k)+1)))
+	//first we pretrain neurons
+	//pretrain,use self-encoding to compress data,the size to be 400*133
+
+	//for fminlbfgs top
+	Mat<int32_t> layer_size;
+	//layer_size = { 400,133 };//the W1:133*400.b1:133
+	//layer_size = layer_size.t();
+	//double sparsityParam = 0.01;// desired average activation of the hidden units.
+	double lambda = 1;// weight decay parameter
+					  //double beta = 3;//weight of sparsity penalty term
+	Mat<double> patches;
+	//for fminlbfgs bottom
+
+	//for fminlbfgs top
+	//Mat<int32_t> layer_size_fminlbfgs;
+	layer_size_fminlbfgs = { 400,33,33,33,10,33,33,33,400 };
+	layer_size_fminlbfgs = layer_size_fminlbfgs.t();
+	layer_size = layer_size_fminlbfgs;
+	//double sparsityParam_fminlbfgs = 0.01;// desired average activation of the hidden units.
+	//double lambda_fminlbfgs = 1;// weight decay parameter
+	//double beta_fminlbfgs = 3;//weight of sparsity penalty term
+	//Mat<double> patches_fminlbfgs;
+	//for fminlbfgs bottom
+
+	std::ifstream file("matlab_data_v2.txt");//to load the labeled sample
+	patches = load_mat<double>(file, "X").t();
+	patches_fminlbfgs = patches;
+
+	field<Mat<double>> W(layer_size.n_rows - 1, 1);
+	field<Mat<double>> b(layer_size.n_rows - 1, 1);
+
+	W.load("W.mat");
+	b.load("b.mat");
+
+	Mat<double> theta_temp;
+	theta_temp = join_vert(vectorise(W(0)), vectorise(b(0)));
+
+	for (uint32_t i = 1; i < layer_size.n_rows - 1; i++)
+	{
+		theta_temp = join_vert(join_vert(theta_temp, vectorise(W(i))), vectorise(b(i)));
+	}
 
 
-		/*//test12 top
-		Mat<double> A;
-		A.load("mat1.txt");
-		vec a = vectorise(A);
+	Theta_indicator_UFLDL.zeros(layer_size.n_rows);
+	int32_t i_init_Theta_indicator_UFLDL;
+	Theta_indicator_UFLDL(0) = 0;
 
-		cout << a << endl;
-		cout <<norm_karl(a)<<endl;
-		system("pause");
-		//test12 bottom*/
+	for (i_init_Theta_indicator_UFLDL = 1;
+		i_init_Theta_indicator_UFLDL < layer_size.n_rows;
+		i_init_Theta_indicator_UFLDL++)
+	{
+		Theta_indicator_UFLDL(i_init_Theta_indicator_UFLDL) =
+			Theta_indicator_UFLDL(i_init_Theta_indicator_UFLDL - 1) +
+			Theta_num(i_init_Theta_indicator_UFLDL - 1);
+	}
 
-		/*//test13 top
-		Mat<double> A;
-		Mat<double> B;
-		A.load("mat1.txt");
-		B = A;
-		cout <<(A==B) <<"\n\r"<< endl;
-		cout << mean(A == B) << "\n\r" << endl;
-		//test13 bottom*/
+	UFLDL_get_Cost_Grad_n_show(theta_temp, layer_size_fminlbfgs,
+		lambda_fminlbfgs, sparsityParam_fminlbfgs, beta_fminlbfgs, patches_fminlbfgs, 2,
+		Theta_indicator_UFLDL);
 
-		/*//test14 top
-		Mat<double> A;
-		Mat<double> B;
-		Col<double> C;
-		C << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
-		A.load("mat1.txt");
-		B = reshape(C, 3, 3);
-		cout <<B <<"\n\r"<< endl;
-		//test14 bottom*/
-		//test bottom------------------------------
+	//practice_9_DeepLearning_fminlbfgs_n_show bottom*/
+
+
+			//test top------------------------------
+			/*//test1 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			A.reshape(A.n_rows*A.n_cols, 1);
+
+			cout << A << endl;
+			system("pause");
+			//test1 bottom*/
+
+			/*//test2 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			A = vectorise(A);
+
+			cout << A << endl;
+			system("pause");
+			//test2 bottom*/
+
+			/*//test3 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			A = vectorise(A);
+			A.reshape(3, 3);
+
+			cout << A << endl;
+			system("pause");
+			//test3 bottom*/
+
+			/*//test3 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			A = vectorise(A);
+			A.row(5);
+
+			cout << A.row(5) << endl;
+			system("pause");
+			//test3 bottom*/
+
+
+			/*//test4 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			A = sigmoid(A);
+
+			cout << A << endl;
+			system("pause");
+			//test4 bottom*/
+
+			/*//test5 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+
+
+			cout << A(3)<<A(2,2) << endl;
+			system("pause");
+			//test5 bottom*/
+
+			/*//test6 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			Mat<double> B;
+			B = log(A);
+
+			cout << B << endl;
+			system("pause");
+			//test6 bottom*/
+
+			/*//test7 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			cout << sum(A) << endl;
+			system("pause");
+			//test7 bottom*/
+
+			/*//test8 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			Mat<double> B;
+			B.ones(1, 1);
+
+			cout << B << endl;
+			system("pause");
+			//test8 bottom*/
+
+			/*//test9 top
+			Mat<double> A;
+			A.load("matlab_data_1.txt");
+
+			cout <<A.n_rows<<"   " <<A.n_cols<< endl;
+			system("pause");
+			//test9 bottom*/
+
+			/*//test10 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			cout <<A.rows(1,2)<<endl;
+			system("pause");
+			//test10 bottom*/
+
+
+			/*//test11 top
+			Mat<double> A;
+			A.load("mat1.txt");
+
+			cout <<A.n_elem<<endl;
+			system("pause");
+			//test11 bottom*/
+
+
+			/*//test12 top
+			Mat<double> A;
+			A.load("mat1.txt");
+			vec a = vectorise(A);
+
+			cout << a << endl;
+			cout <<norm_karl(a)<<endl;
+			system("pause");
+			//test12 bottom*/
+
+			/*//test13 top
+			Mat<double> A;
+			Mat<double> B;
+			A.load("mat1.txt");
+			B = A;
+			cout <<(A==B) <<"\n\r"<< endl;
+			cout << mean(A == B) << "\n\r" << endl;
+			//test13 bottom*/
+
+			/*//test14 top
+			Mat<double> A;
+			Mat<double> B;
+			Col<double> C;
+			C << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
+			A.load("mat1.txt");
+			B = reshape(C, 3, 3);
+			cout <<B <<"\n\r"<< endl;
+			//test14 bottom*/
+
+
+
+			//test bottom------------------------------
 	return 0;
 }
 //main bottom

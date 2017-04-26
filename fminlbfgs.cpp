@@ -8,6 +8,7 @@ extern double sparsityParam_fminlbfgs;// desired average activation of the hidde
 extern double lambda_fminlbfgs;// weight decay parameter
 extern double beta_fminlbfgs;//weight of sparsity penalty term
 extern Mat<double> patches_fminlbfgs;
+extern Mat<uint32_t> Theta_indicator_UFLDL;
 //for fminlbfgs bottom
 
 static lbfgsfloatval_t evaluate(
@@ -25,8 +26,8 @@ static lbfgsfloatval_t evaluate(
 	vec vtemp_g(g, n, false, false);
 	pair<double, Mat<double>> J_grad_pair;
 
-	J_grad_pair = UFLDL_get_Cost_Grad(vtemp_x, layer_size_fminlbfgs(0), layer_size_fminlbfgs(1),
-		lambda_fminlbfgs, sparsityParam_fminlbfgs, beta_fminlbfgs, patches_fminlbfgs, 1);
+	J_grad_pair = UFLDL_get_Cost_Grad_n(vtemp_x, layer_size_fminlbfgs,
+		lambda_fminlbfgs, sparsityParam_fminlbfgs, beta_fminlbfgs, patches_fminlbfgs, 1, Theta_indicator_UFLDL);
 
 	vtemp_g = J_grad_pair.second;
 
